@@ -16,16 +16,11 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Get Last Commit Message
-        id: last_commit
         run: |
-          echo 'MESSAGE<<EOF' >> $GITHUB_ENV
-          git log -1 --pretty=%B >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
 
-      - name: Skip if the commit is a version update
-        if: contains(env.MESSAGE, 'Increment version to')
-        run: echo "Skipping version update commit" && exit 0
-    
+    # Stop the entire job if the last commit message contains "Increment version to"
     if: ${{ !contains(env.LAST_COMMIT_MESSAGE, 'Increment version to') }}
 
     steps:
@@ -40,7 +35,6 @@ jobs:
             BUILD_NUMBER=$(echo "$VERSION" | cut -d. -f4)
             NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
             NEW_VERSION="$BASE_VERSION.$NEW_BUILD_NUMBER"
-            echo "NEW VERSION $NEW_VERSION"
             echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
           fi
 
