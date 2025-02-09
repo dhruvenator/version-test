@@ -30,10 +30,10 @@ jobs:
             echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
           fi
 
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add version.conf
-          git commit -m "Increment version to $(grep -oP '(?<=VERSION=")[^"]+' version.conf)"
-          git push origin main
+      # - name: Commit and push changes
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add version.conf
+      #     git commit -m "Increment version to $(grep -oP '(?<=VERSION=")[^"]+' version.conf)"
+      #     git push origin main
