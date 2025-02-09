@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Read and increment version
         run: |
@@ -26,7 +26,7 @@ jobs:
             BUILD_NUMBER=$(echo "$VERSION" | cut -d. -f4)
             NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
             NEW_VERSION="$BASE_VERSION.$NEW_BUILD_NUMBER"
-            echo "$NEW_VERSION"
+            echo "NEW VERSION $NEW_VERSION"
             echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
           fi
 
