@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  increment-version:
+  version-update:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,15 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Read and increment version
+      - name: Get Last Commit Message
+        id: last_commit
+        run: echo "MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+      - name: Skip if the commit is a version update
+        if: contains(env.MESSAGE, 'Increment version to')
+        run: echo "Skipping version update commit" && exit 0
+
+      - name: Increment version
         run: |
           VERSION_FILE="version.conf"
           if [ ! -f "$VERSION_FILE" ]; then
@@ -30,10 +38,10 @@ jobs:
             echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
           fi
 
-      # - name: Commit and push changes
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #     git add version.conf
-      #     git commit -m "Increment version to $(grep -oP '(?<=VERSION=")[^"]+' version.conf)"
-      #     git push origin main
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.conf
+          git commit -m "Increment version to $(grep -oP '(?<=VERSION=")[^"]+' version.conf)"
+          git push
