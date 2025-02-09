@@ -20,15 +20,8 @@ jobs:
           LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
           echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
 
-      # Stop the workflow if the last commit was a version update
-      - name: Check if last commit is a version update
-        run: |
-          if [[ "$LAST_COMMIT_MESSAGE" == *"Increment version to"* ]]; then
-            echo "Skipping version update commit"
-            exit 1
-          fi
-
       - name: Increment version
+        if: "!contains(env.LAST_COMMIT_MESSAGE, 'Increment version to')"  # Skip if it's already a version update
         run: |
           VERSION_FILE="version.conf"
           if [ ! -f "$VERSION_FILE" ]; then
@@ -43,6 +36,7 @@ jobs:
           fi
 
       - name: Commit and Push Changes
+        if: "!contains(env.LAST_COMMIT_MESSAGE, 'Increment version to')"  # Skip if it's already a version update
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
