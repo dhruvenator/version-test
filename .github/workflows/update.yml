@@ -1,0 +1,38 @@
+name: Increment Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  increment-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read and increment version
+        run: |
+          VERSION_FILE="version.conf"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo 'VERSION="1.0.0.1"' > "$VERSION_FILE"
+          else
+            VERSION=$(grep -oP '(?<=VERSION=")[^"]+' "$VERSION_FILE")
+            BASE_VERSION=$(echo "$VERSION" | cut -d. -f1-3)
+            BUILD_NUMBER=$(echo "$VERSION" | cut -d. -f4)
+            NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+            NEW_VERSION="$BASE_VERSION.$NEW_BUILD_NUMBER"
+            echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.conf
+          git commit -m "Increment version to $(grep -oP '(?<=VERSION=")[^"]+' version.conf)"
+          git push origin main
