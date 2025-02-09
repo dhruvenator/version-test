@@ -18,6 +18,7 @@ jobs:
       - name: Get Last Commit Message
         run: |
           LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ')  # Remove newlines
+          echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE"
           echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Increment version
@@ -32,6 +33,7 @@ jobs:
             BUILD_NUMBER=$(echo "$VERSION" | cut -d. -f4)
             NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
             NEW_VERSION="$BASE_VERSION.$NEW_BUILD_NUMBER"
+            echo "NEW VERSION $NEW_VERSION"
             echo "VERSION=\"$NEW_VERSION\"" > "$VERSION_FILE"
           fi
 
