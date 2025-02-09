@@ -17,11 +17,11 @@ jobs:
 
       - name: Get Last Commit Message
         run: |
-          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ')  # Remove newlines
           echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Increment version
-        if: "!contains(env.LAST_COMMIT_MESSAGE, 'Increment version to')"  # Skip if it's already a version update
+        if: ${{ !contains(env.LAST_COMMIT_MESSAGE, 'Increment version to') }}
         run: |
           VERSION_FILE="version.conf"
           if [ ! -f "$VERSION_FILE" ]; then
@@ -36,7 +36,7 @@ jobs:
           fi
 
       - name: Commit and Push Changes
-        if: "!contains(env.LAST_COMMIT_MESSAGE, 'Increment version to')"  # Skip if it's already a version update
+        if: ${{ !contains(env.LAST_COMMIT_MESSAGE, 'Increment version to') }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
