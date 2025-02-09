@@ -17,7 +17,10 @@ jobs:
 
       - name: Get Last Commit Message
         id: last_commit
-        run: echo "MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+        run: |
+          echo 'MESSAGE<<EOF' >> $GITHUB_ENV
+          git log -1 --pretty=%B >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: Skip if the commit is a version update
         if: contains(env.MESSAGE, 'Increment version to')
