@@ -15,14 +15,14 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Get Last Commit Message
+      - name: Get Last Commit Author
         run: |
-          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr '\n' ' ')  # Remove newlines
-          echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE"
-          echo "LAST_COMMIT_MESSAGE=$LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
+          LAST_COMMIT_AUTHOR=$(git log -1 --pretty=format:'%an')
+          echo "LAST_COMMIT_AUTHOR=$LAST_COMMIT_AUTHOR"
+          echo "LAST_COMMIT_AUTHOR=$LAST_COMMIT_AUTHOR" >> $GITHUB_ENV
 
       - name: Increment version
-        if: ${{ !contains(env.LAST_COMMIT_MESSAGE, 'Increment version to') }}
+        if: ${{ env.LAST_COMMIT_AUTHOR != 'github-actions[bot]' }}
         run: |
           VERSION_FILE="version.conf"
           if [ ! -f "$VERSION_FILE" ]; then
@@ -38,7 +38,7 @@ jobs:
           fi
 
       - name: Commit and Push Changes
-        if: ${{ !contains(env.LAST_COMMIT_MESSAGE, 'Increment version to') }}
+        if: ${{ env.LAST_COMMIT_AUTHOR != 'github-actions[bot]' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
